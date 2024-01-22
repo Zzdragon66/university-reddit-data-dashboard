@@ -110,6 +110,8 @@ clean-airflow:
 	rm $(AIRFLOW_DIR)/reddit_ssh
 	rm $(AIRFLOW_DIR)/reddit_ssh.pub
 	rm $(AIRFLOW_DIR)/gcp_key.json	
+clean-scrape-docker:
+	rm $(SCRAPE_DIR)/gcp_key.json
 clean-scrape-image:
 	rm $(SCRAPE_IMAGE_DIR)/gcp_key.json
 clean-image-caption:
