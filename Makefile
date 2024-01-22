@@ -20,7 +20,10 @@ test:
 	echo "test"
 
 ssh_key_generation : 	
-	ssh-keygen -t ed25519 -N "" -f $(SSH_PRIVATE) -C "airflow"; 
+	@if [ ! -d $(SSH_KEY_DIR) ]; then \
+		mkdir -p "$(SSH_KEY_DIR)"; \
+		ssh-keygen -t ed25519 -N "" -f $(SSH_PRIVATE) -C "airflow"; \
+	fi
 
 docker-builder-init:
 	@if ! docker buildx ls | grep -q "mybuilder"; then \
@@ -93,7 +96,7 @@ ssh_connect:
 		
 clean: 
 	make clean-terraform
-	make -j4 clean-variables clean-terraform-output clean-airflow clean-scrape-image clean-image-caption clean-sentiment-analysis clean-env
+	make -j4 clean-variables clean-terraform-output clean-airflow clean-scrape-image clean-image-caption clean-sentiment-analysis clean-env clean-ssh
 
 clean-terraform:
 	cd $(TERRAFORM_DIR) && terraform destroy
@@ -115,3 +118,5 @@ clean-sentiment-analysis:
 	rm ${SENTIMENT_ANALYSIS_DIR}/gcp_key.json
 clean-env:
 	rm ./.env
+clean-ssh:
+	rm -rf $(SSH_KEY_DIR)

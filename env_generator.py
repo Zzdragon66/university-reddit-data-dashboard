@@ -45,8 +45,8 @@ def ssh_key_dir():
     """
     ssh_dir = input("SSH key store directory: ")
     ssh_dir_path = Path(ssh_dir)
-    if not ssh_dir_path.exists():
-        ssh_dir_path.mkdir(parents=True, exist_ok=True)
+    if ssh_dir_path.exists():
+        raise FileExistsError("the ssh_dir_path exists")
     return {"ssh_directory" : str(ssh_dir_path)}
     
 def get_service_account_email():
