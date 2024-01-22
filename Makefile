@@ -20,8 +20,7 @@ test:
 	echo "test"
 
 ssh_key_generation : 	
-	@if [ ! -d $(SSH_KEY_DIR) ]; then \
-		mkdir -p "$(SSH_KEY_DIR)"; \
+	@if [ ! -f $(SSH_PRIVATE) ]; then \	
 		ssh-keygen -t ed25519 -N "" -f $(SSH_PRIVATE) -C "airflow"; \
 	fi
 
@@ -62,7 +61,7 @@ generate_variables : terraform-output
 		--output_path $(AIRFLOW_MAIN_DIR)/variables.json
 	cd $(AIRFLOW_MAIN_DIR) && echo "AIRFLOW_UID=1000\nAIRFLOW_GID=0\n" > .env	
 
-airflow: docker-builder-init #terraform-output
+airflow: docker-builder-init ssh_key_generation
 	cp $(GCP_SERVICE_CREDENTIAL) $(AIRFLOW_DIR)/gcp_key.json
 	cp $(SSH_PRIVATE) $(AIRFLOW_DIR)
 	cp $(SSH_PUBLIC) $(AIRFLOW_DIR)
