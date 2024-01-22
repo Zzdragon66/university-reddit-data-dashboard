@@ -1,7 +1,10 @@
 import json
+import os
 from pathlib import Path
 from argparse import ArgumentParser
+from dotenv import load_dotenv
 
+load_dotenv()
 # Terraform output variables 
 TERRAFORM_BUCKETS = [
     "image_bucket",
@@ -54,6 +57,9 @@ def get_ssh_public_key(ssh_pubic_key_path : str) -> str:
         fst_line = f.readline().strip()
     return fst_line
 
+def generate_docker_variable():
+    return {"docker_username" : os.environ.get("docker_username")}
+
 def generate_other_variables():
     return {
         "start_date" : "a",
@@ -82,6 +88,7 @@ def main():
     json_dict.update(terraform_dict)
     json_dict.update(ssh_dict)
     json_dict.update(other_vars_dict)
+    json_dict.update(generate_docker_variable())
     print(json_dict)
     with open(args.output_path, 'w') as json_file:
         json.dump(json_dict, json_file)

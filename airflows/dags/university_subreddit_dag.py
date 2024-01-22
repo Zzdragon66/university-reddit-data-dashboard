@@ -113,9 +113,9 @@ def pull_vm_dockers():
     """
     Pull the docker image from Dockerhub respository for VM machines
     """
-    command_str = """
-                    sudo docker pull zzdragon/scrape-reddit:latest &&
-                    sudo docker pull zzdragon/scrape-image:latest
+    command_str = f"""
+                    sudo docker pull {Variable.get("docker_username")}/scrape-reddit:latest &&
+                    sudo docker pull {Variable.get("docker_username")}/scrape-image:latest
     """
     ssh_pull_op_lst = [] 
     n_ssh_connections = int(Variable.get("n_ssh_connections"))
@@ -134,14 +134,14 @@ def pull_vm_dockers():
 def pull_gpu_docker():
     """_Pull the docker image for GPU"""
     image_names = ["reddit-image-caption", "reddit-sentiment-analysis"] 
-    command_str_format = """sudo docker pull zzdragon/{image_name}:latest"""
+    command_str_format = """sudo docker pull {docker_name}/{image_name}:latest"""
     gpu_vm_name = Variable.get("gpu_vm_name")
     gpu_ssh_pull_ops = []
     for image_name in image_names:
         ssh_pull_op = SSHOperator(
                 task_id = f"gpu_pull_docker_image_of_{image_name}",
                 ssh_conn_id = gpu_vm_name,
-                command = command_str_format.format(image_name = image_name),
+                command = command_str_format.format(docker_name = Variable.get("docker_username"), image_name = image_name),
                 conn_timeout = 1000,
                 cmd_timeout = 1000
             )
@@ -161,7 +161,7 @@ def ssh_scrape_reddit_ops_generator(ssh_pull_ops):
         conn_idx= subreddit_idx % n_connections # the conn id 
         subreddit = SUBREDDITS[subreddit_idx] 
         command_str =f"""
-            sudo docker run zzdragon/scrape-reddit:latest \
+            sudo docker run {Variable.get("docker_username")}/scrape-reddit:latest \
                 --client_id "{client_ids[conn_idx]}" \
                 --client_secret "{client_secrets[conn_idx]}" \
                 --start_date {Variable.get("start_date")} \
@@ -208,7 +208,7 @@ def image_scrape_op_generator():
     directory = Variable.get("directory")
     ssh_op_lst = []
     for idx in range(n_vm_instances):
-        command_str = f"""sudo docker run zzdragon/scrape-image:latest\
+        command_str = f"""sudo docker run {Variable.get("docker_username")}/scrape-image:latest\
             --n_vm_instances {n_vm_instances} \
             --vm_idx {idx} \
             --storage_bucket {image_bucket_name} \
@@ -228,7 +228,7 @@ def image_scrape_op_generator():
 def image_caption_op_generator():
     conn_id = Variable.get("gpu_vm_name")
     image_bucket_name = Variable.get("image_bucket")
-    command_str = f"""sudo docker run --gpus all zzdragon/reddit-image-caption:latest \
+    command_str = f"""sudo docker run --gpus all {Variable.get("docker_username")}/reddit-image-caption:latest \
         --image_bucket_name {image_bucket_name} \
         --date_directory {Variable.get("directory")} \
         --image_meta_path {DATA_META_COMBINED_PATH}
@@ -276,7 +276,7 @@ def sentiment_analysis_op_generator():
     """Sentiment analysis of the data"""
     conn_id = Variable.get("gpu_vm_name")
     command_str = f"""
-        sudo docker run --gpus all zzdragon/reddit-sentiment-analysis:latest --text_bucket_name {Variable.get("text_bucket")} --date_directory {Variable.get("directory")} --image_text_path {f"{IMAGE_TEXT_DIR}/{IMAGE_TEXT_FILENAME}"} --output_bucket_name {Variable.get("text_bucket")} --output_path {IMAGE_TEXT_SENTIMENT_PATH}
+        sudo docker run --gpus all {Variable.get("docker_username")}/reddit-sentiment-analysis:latest --text_bucket_name {Variable.get("text_bucket")} --date_directory {Variable.get("directory")} --image_text_path {f"{IMAGE_TEXT_DIR}/{IMAGE_TEXT_FILENAME}"} --output_bucket_name {Variable.get("text_bucket")} --output_path {IMAGE_TEXT_SENTIMENT_PATH}
     """
     return SSHOperator(
         task_id = "sentiment_analysis",
