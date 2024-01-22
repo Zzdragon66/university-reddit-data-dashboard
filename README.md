@@ -104,6 +104,8 @@ You may need to request quota change [here](https://console.cloud.google.com/iam
 
 ## Installation
 
+### Warning: Due to GPU shortage, the gpu accelerator may not be available in certain regions. Terraform may fail to initialize computing resources.
+
 ### Warning: Docker builds may take some time because the size of deep learning images are large
 
 ### Warning: the scraping can take hours to run because of rate limit of reddit api
