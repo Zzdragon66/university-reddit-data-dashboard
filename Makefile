@@ -96,7 +96,7 @@ ssh_connect:
 		
 clean: 
 	make clean-terraform
-	make -j4 clean-variables clean-terraform-output clean-airflow clean-scrape-image clean-image-caption clean-sentiment-analysis clean-env clean-ssh
+	make -j4 clean-variables clean-terraform-output clean-airflow clean-scrape-image clean-image-caption clean-sentiment-analysis clean-env clean-ssh clean-scrape-docker
 
 clean-terraform:
 	cd $(TERRAFORM_DIR) && terraform destroy
