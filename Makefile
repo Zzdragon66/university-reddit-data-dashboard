@@ -20,9 +20,7 @@ test:
 	echo "test"
 
 ssh_key_generation : 	
-	@if [ ! -f $(SSH_PRIVATE) ]; then \	
-		ssh-keygen -t ed25519 -N "" -f $(SSH_PRIVATE) -C "airflow"; \
-	fi
+	ssh-keygen -t ed25519 -N "" -f $(SSH_PRIVATE) -C "airflow"; 
 
 docker-builder-init:
 	@if ! docker buildx ls | grep -q "mybuilder"; then \
