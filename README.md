@@ -93,7 +93,7 @@ You may need to request quota change [here](https://console.cloud.google.com/iam
 
 * At [Reddit App](https://www.reddit.com/prefs/apps), create the application
 * Each virtual machine needs a reddit client, so if there are two virtual machines for scraping, then you need to use two reddit account to create two applications respectively.
-* Record the reddit client into a json file with the following format. You will be prompted to input the reddit client file path.
+* Record the reddit client into a json file with the following format. You will be prompted to input the reddit client file path. 
 
 ```json
 {
@@ -130,7 +130,9 @@ The following environment variable is required and by running `python3 env_gener
 * `n_worknodes` : the number of work nodes in the spark cluster
 * `subreddits` : the subreddits seperated by space
 
-### Make the project 
+### Make sure Docker Dameon is running
+
+### Make the project
 
 1. In the terminal, run `make reddit-data-dashboard` and follow the prompt
 2. At the end, make will return strings having the following format 
