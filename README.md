@@ -4,23 +4,26 @@ The University Reddit Data Dashboard provides a comprehensive view of key statis
 
 ## Features
 
-The project is entirely hosted on the Google Cloud Platform and is ***horizontal scalable***. The scraping workload is evenly distributed across the computer engines(VM). Data manipulation is done through the Spark cluster(Google dataproc), where by increasing the worker node, the workload will be distributed across and finished more quickly.
+1. The project is entirely hosted on the Google Cloud Platform 
+2. This project is ***horizontal scalable***. The scraping workload is evenly distributed across the computer engines(VM). Data manipulation is done through the Spark cluster(Google dataproc), where by increasing the worker node, the workload will be distributed across and finished more quickly.
+3. The data transformation phase incorporates ***deep learning*** techniques to enhance analysis and insights.
+4. For data visualization, the project utilizes D3.js to create graphical representations.
 
 ## Project Structure
 
-<img src="./README_resources/project_structure.jpg" alt="project_structure" width="1200"/>
+<img src="./README_resources/project_structure.png" alt="project_structure" width="1200"/>
 
-## Examples
+## Data Dashboard Examples
 
-The following [dashboard](https://lookerstudio.google.com/reporting/97414aef-54dc-4fc8-8bf5-054f0ac75d2c) is generated with following parameters: 1 VM for airflow, 2 VMs for scraping, 1 VM with Nvidia-T4 GPU, Spark cluster(2 worker node 1 manager node), 10 universities in California.
+### Example Local Dashboard(D3.js)
 
-### Example Dashboard
+<img src="./README_resources/data-dashboard-local-example.png" alt="Local Data Dashboard" width="750"/>
 
-<img src="./README_resources/university_subreddit_data_dashboard.png" alt="Dashboard" width="1000"/>
+### Example Google Looker Studio Data Dashboard
 
-### Example DAG
+[Looker Studio Data Dashboard](https://lookerstudio.google.com/s/hEfY-Q6G4Fo)
 
-<img src="./README_resources/example_dag.png" alt="AirflowDag" width="1200"/>
+<img src="./README_resources/university_subreddit_data_dashboard.png" width="500"/>
 
 
 ## Tools
@@ -45,7 +48,9 @@ The following [dashboard](https://lookerstudio.google.com/reporting/97414aef-54d
 5. Terraform(*Cloud Infrastructure Management*)
 6. Docker(*containerization*) and Dockerhub(*Distribute container images*)
 7. SQL(*Data Manipulation*)
-8. Makefile
+8. Javascript
+   1. D3.js for data visualization
+9.  Makefile
 
 ## Preparation
 
@@ -93,7 +98,7 @@ You may need to request quota change [here](https://console.cloud.google.com/iam
 
 * At [Reddit App](https://www.reddit.com/prefs/apps), create the application
 * Each virtual machine needs a reddit client, so if there are two virtual machines for scraping, then you need to use two reddit account to create two applications respectively.
-* Record the reddit client into a json file with the following format. You will be prompted to input the reddit client file path. 
+* Record the reddit client into a json file with the following format. You will be prompted to input the reddit client file path.
 
 ```json
 {
@@ -130,11 +135,10 @@ The following environment variable is required and by running `python3 env_gener
 * `n_worknodes` : the number of work nodes in the spark cluster
 * `subreddits` : the subreddits seperated by space
 
-### Make sure Docker Dameon is running
-
-### Make the project
+### Make the project 
 
 1. In the terminal, run `make reddit-data-dashboard` and follow the prompt
+   1. To skip repetitive make docker-image, you can pass the variable in `make reddit-data-dashboard IF_DEEP_LEARNING_IMAGES=false`
 2. At the end, make will return strings having the following format 
 
 ```bash
@@ -150,6 +154,11 @@ ssh -v -i path -L 8080:localhost:8080 airflow@12.34.56.78
 5. At the brower, enter `localhost:8080`. The username is `airflow` and password is `airflow`
 6. Go to [Variable](http://localhost:8080/variable/list/) page, and import the `variables.json` at airflows folder
 7. Go to [DAG](http://localhost:8080/dags/university-subreddit-data-dashboard/grid) and Run the DAG
+
+### Data Visualization
+
+* After the data pipeline finished, run `make dashboard` to generate the local data dashboard
+* local datadashboard is at `localhost:5050`
 
 ### Tear Down the project 
 
@@ -169,55 +178,66 @@ Run `make clean` and follow the prompt
 ├── Makefile
 ├── README.md
 ├── README_resources
-│   ├── example_dag.png
-│   ├── project_structure.jpg
-│   └── university_subreddit_data_dashboard.png
+│   ├── data-dashboard-local-example.png
+│   ├── example_dag.png
+│   ├── project_structure.png
+│   └── university_subreddit_data_dashboard.png
 ├── airflows
-│   ├── dags
-│   │   └── university_subreddit_dag.py
-│   ├── docker-compose.yaml
-│   └── scripts
-│       └── etl
-│           ├── dataproc_merge_files.py
-│           ├── dataproc_merge_two_files.py
-│           ├── dataproc_merge_two_files_submit.py
-│           ├── dataproc_single_directory.py
-│           ├── gcs_to_bigquery.py
-│           ├── generate_data_for_report.py
-│           ├── proj_init.py
-│           └── sql_queries
-│               ├── basic_statistics.sql
-│               ├── comments_breakdown.sql
-│               ├── post_breakdown.sql
-│               ├── sentiment_score.sql
-│               ├── top_author.sql
-│               └── top_score_posts.sql
+│   ├── dags
+│   │   └── university_subreddit_dag.py
+│   ├── docker-compose.yaml
+│   └── scripts
+│       └── etl
+│           ├── dataproc_merge_files.py
+│           ├── dataproc_merge_two_files.py
+│           ├── dataproc_merge_two_files_submit.py
+│           ├── dataproc_single_directory.py
+│           ├── gcs_to_bigquery.py
+│           ├── generate_data_for_report.py
+│           ├── proj_init.py
+│           └── sql_queries
+│               ├── basic_statistics.sql
+│               ├── comments_breakdown.sql
+│               ├── post_breakdown.sql
+│               ├── sentiment_score.sql
+│               ├── top_author.sql
+│               └── top_score_posts.sql
+├── data_dashboard
+│   ├── data
+│   ├── download_data.py
+│   ├── index.html
+│   ├── js
+│   │   └── script.js
+│   └── style
+│       └── style.css
 ├── env_generator.py
 ├── make_variables.py
 ├── python_requirements.txt
 ├── services
-│   ├── airflow_image
-│   │   ├── Dockerfile
-│   │   └── python_requirements.txt
-│   ├── image_caption_docker
-│   │   ├── Dockerfile
-│   │   ├── image_caption.py
-│   │   └── python_requirements.txt
-│   ├── image_scrape_docker
-│   │   ├── Dockerfile
-│   │   ├── image_scraping.py
-│   │   └── python_requirements.txt
-│   ├── scrape_docker
-│   │   ├── Dockerfile
-│   │   ├── reddit_scraping.py
-│   │   └── requirements.txt
-│   └── sentiment_analysis_docker
-│       ├── Dockerfile
-│       ├── python_requirements.txt
-│       └── sentiment_analysis.py
+│   ├── airflow_image
+│   │   ├── Dockerfile
+│   │   └── python_requirements.txt
+│   ├── image_caption_docker
+│   │   ├── Dockerfile
+│   │   ├── image_caption.py
+│   │   └── python_requirements.txt
+│   ├── image_scrape_docker
+│   │   ├── Dockerfile
+│   │   ├── image_scraping.py
+│   │   └── python_requirements.txt
+│   ├── scrape_docker
+│   │   ├── Dockerfile
+│   │   ├── reddit_scraping.py
+│   │   └── requirements.txt
+│   └── sentiment_analysis_docker
+│       ├── Dockerfile
+│       ├── python_requirements.txt
+│       └── sentiment_analysis.py
 ├── ssh_command.py
 └── terraform
     ├── main.tf
     ├── output.tf
+    ├── terraform.tfstate
+    ├── terraform.tfstate.backup
     └── variables.tf
 ```

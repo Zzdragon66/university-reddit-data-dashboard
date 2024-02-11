@@ -1,5 +1,5 @@
 SELECT
-  t1.authorname as Name,
+  distinct t1.authorname as Name,
   MAX(author_url) as URL,
   MAX(school) as school,
   SUM(if_post) as `Posts`,

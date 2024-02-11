@@ -2,6 +2,7 @@ import json
 import os
 from pathlib import Path
 from argparse import ArgumentParser
+from datetime import datetime, timedelta
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -60,12 +61,18 @@ def get_ssh_public_key(ssh_pubic_key_path : str) -> str:
 def generate_docker_variable():
     return {"docker_username" : os.environ.get("docker_username")}
 
-def generate_other_variables():
-    return {
-        "start_date" : "a",
-        "end_date" : "a",
-        "directory" : "a"
-    }
+def generate_date() -> (str, str):
+    '''Generate the start date and end date'''
+    today = datetime.today()
+    # end_date = "2024-01-17"
+    # start_date = "2024-01-10"
+    # return start_date, end_date
+    end_date = today.date() - timedelta(days=1)
+    start_date = today.date() - timedelta(days = 8)
+    return {"start_date" : str(start_date), 
+            "end_date" : str(end_date),
+            "directory" : f"{str(start_date)}-{str(end_date)}"}
+
 
 def main():
     parser = ArgumentParser("Make variables for airflow with json output")
@@ -76,7 +83,7 @@ def main():
     args = parser.parse_args()
     reddit_dict = get_reddit_json(args.reddit_path)
     terraform_dict = get_terraform_json(args.terraform_path)
-    other_vars_dict = generate_other_variables()
+    date_dir = generate_date()
     # HARDCODE SSH_KEY_PATH
     ssh_dict = {
         "ssh_private_key_path" : "/opt/airflow/reddit_ssh",
@@ -87,7 +94,7 @@ def main():
     json_dict.update(reddit_dict)
     json_dict.update(terraform_dict)
     json_dict.update(ssh_dict)
-    json_dict.update(other_vars_dict)
+    json_dict.update(date_dir)
     json_dict.update(generate_docker_variable())
     print(json_dict)
     with open(args.output_path, 'w') as json_file:

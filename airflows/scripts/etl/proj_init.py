@@ -92,11 +92,11 @@ def project_init() -> dict:
     # Get the terraform and reddit data
     ret_dict = {}
     # Generate the dates 
-    start_date, end_date = generate_date()
-    ret_dict["start_date"] = str(start_date)
-    ret_dict["end_date"] = str(end_date)
-    date_str = f"{start_date}-{end_date}"
-    ret_dict["directory"] = date_str
+    # start_date, end_date = generate_date()
+    # ret_dict["start_date"] = str(start_date)
+    # ret_dict["end_date"] = str(end_date)
+    # date_str = f"{start_date}-{end_date}"
+    # ret_dict["directory"] = date_str
     # Put the ssh_key path
     if not Path(SSH_KEY_PATH).exists():
         raise FileNotFoundError("The SSH key is not found under this path")

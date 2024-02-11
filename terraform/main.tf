@@ -136,7 +136,9 @@ resource "google_compute_instance" "airflow" {
       sudo apt-get update
       sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
       sudo apt-get install python3-pip
+      sudo apt install nodejs npm -y
       sudo docker login --username ${var.docker_username} --password ${var.docker_password}
+      sudo npm install -g live-server
     EOT 
   }
   service_account {

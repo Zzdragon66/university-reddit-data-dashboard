@@ -1,3 +1,4 @@
+"""Generate the environment variable for the project initialization"""
 import subprocess
 from pathlib import Path
 import json
@@ -28,6 +29,8 @@ def gcp_keys():
     gcp_key_path = input("gcp service account key path: ")
     if not Path(gcp_key_path).exists():
         raise FileNotFoundError("the gcp account key is not found")
+    if not gcp_key_path.endswith(".json"):
+        raise FileExistsError("This should be a json file")
     gcp_project_id = input("GCP project id: ") 
     return {"gcp_key_path" : gcp_key_path,
             "gcp_project_id" : gcp_project_id
@@ -38,30 +41,31 @@ def get_reddit_credential():
     reddit_credential_path = input("reddit credential path: ")
     if not Path(reddit_credential_path).exists():
         raise FileNotFoundError("the reddit credential is not found")
+    if not reddit_credential_path.endswith(".json"):
+        raise FileExistsError("This should be a json file")
     return {"reddit_credential" : reddit_credential_path}
 
 def ssh_key_dir():
     """Ask the user where to store the SSH key 
     """
-    ssh_dir = input("SSH key store directory: ")
+    ssh_dir = input("SSH key store directory(Please Enter a directory that does not exist): ")
     ssh_dir_path = Path(ssh_dir)
     if ssh_dir_path.exists():
         raise FileExistsError("the ssh_dir_path exists")
     return {"ssh_directory" : str(ssh_dir_path)}
     
 def get_service_account_email():
-    """Get service account email for the terraform infrastructure
-    """
+    """Get service account email for the terraform infrastructure"""
     service_account_email = input('service_account_email: ')
     return {"service_account_email" : service_account_email}
 
 def resources_prompt():
     """Get the number of vms and worknodes in the project"""
-    n_vms = input("number of VM instances(Default to 2): ")
+    n_vms = input("Number of VM instances(Default to 2): ")
     if len(n_vms) == 0:
         n_vms = 2
     n_vms = int(n_vms)
-    n_worknodes = input("number of spark work nodes(Default to 2): ")
+    n_worknodes = input("Number of spark work nodes(Default to 2): ")
     if len(n_worknodes) == 0:
        n_worknodes = 2
     n_worknodes = int(n_worknodes)
@@ -104,10 +108,24 @@ def sanity_check(input_dict : dict):
         raise AssertionError("the number of vm should be equal to number of vms")
     return True
 
+def write_docker_compose(docker_username : str, AIRFLOW_UID :int =1000, AIRFLOW_GID :int =0):
+    """Write the docker-compose in airflows folder
+
+    Args:
+        docker_username (str): the docker username 
+        AIRFLOW_UID (int, optional): sys UID of airflow Defaults to 1000.
+        AIRFLOW_GID (int, optional): sys GID of airflow Defaults to 0.
+    """
+    with open("./airflows/.env", "w") as f:
+        f.write(f"AIRFLOW_UID={AIRFLOW_UID}\n")
+        f.write(f"AIRFLOW_GID={AIRFLOW_GID}\n")
+        f.write(f"AIRFLOW_IMAGE_NAME={docker_username}/reddit-airflow:latest\n")
+
 def main():
     """Main function"""
+    docker_dict = get_docker_credential()
     input_dict = {}
-    input_dict.update(get_docker_credential())
+    input_dict.update(docker_dict)
     input_dict.update(get_service_account_email())
     input_dict.update(gcp_keys())
     input_dict.update(get_reddit_credential())
@@ -116,6 +134,7 @@ def main():
     input_dict.update(subreddit_prompt())
     sanity_check(input_dict)
     write_to_environmenet(input_dict)
+    write_docker_compose(docker_dict["docker_username"])
     
 if __name__ == "__main__":
     main()

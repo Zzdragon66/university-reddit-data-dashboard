@@ -1,4 +1,6 @@
 include .env
+IF_DEEP_LEARNING_IMAGES := true
+IF_OTHER_DOCKER_IMAGES := true
 IMAGE_TAG := latest
 AIRFLOW_MAIN_DIR := ./airflows
 AIRFLOW_DIR := services/airflow_image
@@ -13,6 +15,8 @@ SSH_PRIVATE := $(SSH_KEY_DIR)/reddit_ssh
 SSH_PUBLIC := $(SSH_KEY_DIR)/reddit_ssh.pub
 REDDIT_CREDENTIAL := $(reddit_credential)
 GCP_SERVICE_CREDENTIAL := $(gcp_key_path)
+# Dashboard Directory
+DASHBOARD_DIR := data_dashboard/
 
 # the ssh key path is $HOME/ssh_key and 
 
@@ -60,7 +64,6 @@ generate_variables : terraform-output
 		--terraform_path terraform.json \
 		--ssh_public_key_path $(SSH_PUBLIC) \
 		--output_path $(AIRFLOW_MAIN_DIR)/variables.json
-	cd $(AIRFLOW_MAIN_DIR) && echo "AIRFLOW_UID=1000\nAIRFLOW_GID=0\n" > .env	
 
 airflow: docker-builder-init ssh_key_generation
 	cp $(GCP_SERVICE_CREDENTIAL) $(AIRFLOW_DIR)/gcp_key.json
@@ -87,9 +90,23 @@ sentiment_analysis_image : docker-builder-init
 
 # Make the reddit-data-dashboard 
 
-reddit-data-dashboard: airflow scrape_reddit scrape_image generate_variables image_caption_image sentiment_analysis_image 
+deep-learning-image: docker-builder-init 
+	if [ "$(IF_DEEP_LEARNING)" = "true" ]; then \
+		make -j4 image_caption_image sentiment_analysis_image; \
+	fi
+
+docker-image: docker-builder-init  
+	if [ "$(IF_OTHER_DOCKER_IMAGES)" = "true" ]; then \
+		make -j4 airflow scrape_reddit scrape_image; \
+	fi
+
+reddit-data-dashboard: generate_variables docker-image deep-learning-image 
 	docker buildx rm mybuilder
 	make ssh_connect
+
+dashboard:
+	cd $(DASHBOARD_DIR) && python3 download_data.py --gcp_key_path $(gcp_key_path) --variable_path ../airflows/variables.json 
+	cd $(DASHBOARD_DIR) && live-server --port=5050
 
 ssh_connect:
 	@python3 ssh_command.py --input "$$(cd terraform && terraform output | grep 'airflow_external_ip')" 

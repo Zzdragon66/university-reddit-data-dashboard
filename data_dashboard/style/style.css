@@ -1,0 +1,95 @@
+body {
+    background-color: white;
+    color: black;
+    font-family :'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.page-container {
+    display: flex;
+}
+
+.page-left {
+    flex : 1
+}
+
+.page-right {
+    flex : 1
+}
+
+.left-title {
+    color : #0C63BD;
+    text-align: left;
+    font-size: 35px;
+    margin-left: 250px;
+    margin-top: 1px;
+    margin-bottom: 0;
+}
+
+.basic-stat-container {
+    display: flex;
+    justify-content: space-around;
+}
+
+.basic-stat-item {
+    color: black; 
+    padding: 10px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.basic-stat-data-value {
+    font-size: 2em;
+    font-weight: bold;
+}
+
+.basic-stat-data-label {
+    font-size: 1em;
+    color: #555;
+}
+
+.table-header {
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 2px;
+    color : #0C63BD;
+}
+
+.table {
+    overflow-y: auto;
+    max-height: 360px;
+    max-width: 100%;
+    border-spacing: 3px;
+    margin-bottom: 10px;
+    font-size: 17.5px;
+}
+
+.table thead {
+    background-color: gray;
+    color: white;
+}
+
+.table th {
+    font-size: 19px;
+    border: 1px solid black;
+}
+
+#user-table {
+    max-height: 200px;
+}
+
+/* Add this to ensure that the scrollbar width does not affect the table layout */
+::-webkit-scrollbar {
+    width: 12px; /* Width of the scrollbar */
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: #f1f1f1; /* Track color */
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: #888; /* Handle color */
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: #555; /* Handle color on hover */
+  }

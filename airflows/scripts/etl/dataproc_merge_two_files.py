@@ -13,7 +13,7 @@ def initialize_spark():
 
 
 def merge_two_files(spark, file_path1 : str, file_path2 : str, output_path : str, sql_statement : str):
-    """Merge two files"""
+    """Merge two files assume the table for file-path1 is at df1 and table for file-path2 is at df2"""
     df1 = spark.read.parquet(file_path1)
     df2 = spark.read.parquet(file_path2)
     df1.createOrReplaceTempView("df1")

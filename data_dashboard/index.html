@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./style/style.css">
+    
+</head>
+<body>
+    <title>Univeristy Subreddit Data Dashboard</title>
+    <div class="page-container">
+        <div class="page-left">
+            <h1 class="left-title">University Subreddit Data Dashboard</h1>
+            <div class="basic-stat-container">
+                <div class="basic-stat-item">
+                    <div class="data-label">Number of Posts</div>
+                    <div class="basic-stat-data-value" id="numberOfPosts"></div>
+                  </div>
+                  <div class="basic-stat-item">
+                    <div class="data-label">Number of Comments</div>
+                    <div class="basic-stat-data-value" id="numberOfComments"></div>
+                  </div>
+                  <div class="basic-stat-item">
+                    <div class="data-label">Number of Authors</div>
+                    <div class="basic-stat-data-value" id="numberOfAuthors"></div>
+                  </div>
+            </div>
+        </div>
+        <div class="page-right">
+            <h3 class="table-header">Top Posts</h3>
+            <div class="table" id="post-table">
+                
+            </div>
+            <h3 class="table-header">Top Users</h3>
+            <div class="table" id="user-table">
+                
+            </div>
+        </div>
+    </div>
+    
+<script src="./js/script.js"></script>
+    
+
+</body>
